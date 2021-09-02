@@ -1,18 +1,19 @@
 let tasks = []; // maintain a list of my tasks
 
 const updateTime = () => {
-    chrome.storage.local.get(["timer"], (res) => {
+    chrome.storage.local.get(["timer", "timeOption"], (res) => {
         const time = document.getElementById("time");
-        const minutes = `${25 - Math.ceil(res.timer / 60)}`.padStart(2,0);
+        const minutes = `${res.timeOption - Math.ceil(res.timer / 60)}`.padStart(2,0);
         let seconds = "00";
         if (res.timer % 60 != 0) {
             seconds = `${60 - res.timer % 60}`.padStart(2, 0);
         };
         time.textContent = `${minutes}:${seconds}`;
         console.log(res.timer);
-        // if (res.timer === 3) {
-        //     setInterval(startTimerButton.textContent = "start", 1000);
-        // }
+
+        chrome.action.setBadgeText({
+            text: minutes,
+        })
     })
 }
 
@@ -68,6 +69,7 @@ const renderTask = (taskIndex) => {
     text.type = "text";
     text.placeholder = "Enter a task...";
     text.value = tasks[taskIndex];
+    text.className = "task-input";
     text.addEventListener("change", () => {
         tasks[taskIndex] = text.value;
         saveTasks();
@@ -76,6 +78,7 @@ const renderTask = (taskIndex) => {
     const deleteButton = document.createElement("input");
     deleteButton.type = "button";
     deleteButton.value = "X";
+    deleteButton.className = "task-delete";
     deleteButton.addEventListener("click", () => {
         deleteTask(taskIndex);
     })
